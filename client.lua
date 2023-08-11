@@ -223,6 +223,10 @@ function SpawnVehicle(model, location)
     SetVehicleOnGroundProperly(vehicle)
     SetEntityAsMissionEntity(vehicle, true, true)
     SetModelAsNoLongerNeeded(model)
+
+    if GetResourceState("ND_Fuel") == "started" then
+        exports["ND_Fuel"]:SetFuel(vehicle, 100)
+    end
 end
 
 -- function to trailer vehicle at desired location
