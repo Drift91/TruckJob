@@ -9,6 +9,7 @@ local player, playerCoords = nil, nil
 local jobStarted = false
 local truck, trailer = nil, nil
 local opti
+local vehicle
 
 -- draw blip on the map
 CreateThread(function()
@@ -26,6 +27,9 @@ CreateThread(function()
     while true do
         player = PlayerPedId()
         playerCoords = GetEntityCoords(player)
+		if jobStarted then
+			vehicle = GetVehiclePedIsIn(player, false)
+		end
         Wait(500)
     end
 end)
@@ -186,9 +190,8 @@ function EndJob()
                 if IsControlPressed(1, 38) then
                     RemoveBlip(blip)
                     -- deletes truck and trailer
-                    local truck = GetVehiclePedIsIn(PlayerPedId(), false)
-                    if GetEntityModel(truck) == GetHashKey(Config.TruckModel) then
-                        DeleteVehicle(GetVehiclePedIsIn(PlayerPedId(), false))
+                    if vehicle == truck then
+                        DeleteVehicle(truck)
                     end
                     DeleteVehicle(trailer)
                     if Config.UseND then
@@ -232,7 +235,7 @@ function SpawnVehicle(model, location)
     while not HasModelLoaded(model) do
         Wait(500)
     end
-    vehicle = CreateVehicle(model, location.x, location.y, location.z, location.h, true, false)
+    local vehicle = CreateVehicle(model, location.x, location.y, location.z, location.h, true, false)
     SetVehicleOnGroundProperly(vehicle)
     SetEntityAsMissionEntity(vehicle, true, true)
     SetModelAsNoLongerNeeded(model)
@@ -241,7 +244,7 @@ function SpawnVehicle(model, location)
         exports["ND_Fuel"]:SetFuel(vehicle, 100)
     end
 
-    return vehicle
+    truck = vehicle; return vehicle
 end
 
 -- function to trailer vehicle at desired location
